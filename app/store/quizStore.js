@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
-
+ 
+// Notification handling...
 const notifyAchievement = async (title, desc) => {
   await Notifications.scheduleNotificationAsync({
     content: {
