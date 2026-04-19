@@ -32,7 +32,7 @@ export default function HomeScreen() {
   const totalScore = profile?.totalScore || results.totalScore || 0; 
   const correctAnswers = profile?.totalCorrect || results.correct || 0;
   
-  const userInitial = profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S';
+  const userInitial = (profile?.fullName || user?.displayName || 'S').charAt(0).toUpperCase();
   const profileImage = profile?.photoURL || user?.photoURL;
 
   const handleCategoryPress = (categoryId, title) => {
@@ -69,7 +69,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.welcomeText}>Hello,</Text>
-            <Text style={styles.userName}>{profile?.fullName?.split(' ')[0] || 'Scholar'}</Text>
+            <Text style={styles.userName}>{profile?.fullName?.split(' ')[0] || user?.displayName?.split(' ')[0] || 'Scholar'}</Text>
           </View>
           <TouchableOpacity onPress={() => router.push('/(main)/profile')}>
             {profileImage ? (

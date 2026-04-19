@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, Alert, ActivityIndicator, AppState } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,8 +12,6 @@ import { useAuthStore } from '../../store/authStore';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
-const { width } = Dimensions.get('window');
-
 export default function QuizScreen() {
   const { categoryId, categoryTitle } = useLocalSearchParams();
   const router = useRouter();
@@ -24,6 +22,7 @@ export default function QuizScreen() {
   const { setQuestions, submitAnswer, tick, resetQuiz, isFinished, results } = useQuizStore();
 
   const [isStarted, setIsStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const questions = QUIZ_DATA[categoryId] || [];
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -32,25 +31,56 @@ export default function QuizScreen() {
   const [timeLeft, setTimeLeft] = useState(20); 
 
   const progressAnim = useRef(new Animated.Value(0)).current;
+  const appState = useRef(AppState.currentState);
 
+  // 1. Initial Setup
   useEffect(() => {
-    Alert.alert(
-      "Ready to Start?",
-      `You are about to begin the ${categoryTitle} assessment. Once started, you cannot leave without losing progress.`,
-      [
-        { text: "Go Back", onPress: () => router.back(), style: "cancel" },
-        { text: "Start Quiz", onPress: () => setIsStarted(true) }
-      ]
-    );
-    if (questions.length > 0) {
-      setQuestions(questions, categoryId); 
-    }
+    let isMounted = true;
+
+    const prepareQuiz = () => {
+      if (questions.length > 0) {
+        setQuestions(questions, categoryId);
+        if (isMounted) setIsLoading(false);
+        
+        setTimeout(() => {
+          Alert.alert(
+            "Fair Play Rules 🛡️",
+            `Leaving this screen clears progress.\nSwitching apps or minimizing terminates the quiz.\nScores are only saved on completion.`,
+            [
+              { text: "Go Back", onPress: () => router.back(), style: "cancel" },
+              { text: "I Understand, Start", onPress: () => setIsStarted(true) }
+            ],
+            { cancelable: false }
+          );
+        }, 500);
+      }
+    };
+
+    prepareQuiz();
+
     return () => {
+      isMounted = false;
       resetQuiz();
-      setCurrentQuestionIndex(0);
-      setScore(0);
     };
   }, [categoryId]);
+
+  // For Anti-Cheat 
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (isStarted && !isFinished && appState.current === 'active' && nextAppState.match(/inactive|background/)) {
+        resetQuiz();
+        setIsStarted(false);
+        router.replace('/(main)');
+        
+        setTimeout(() => {
+          Alert.alert("Terminated", "App minimized. Progress cleared.");
+        }, 100);
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => subscription.remove();
+  }, [isStarted, isFinished]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
@@ -59,14 +89,18 @@ export default function QuizScreen() {
       e.preventDefault();
 
       Alert.alert(
-        'Discard Quiz?',
-        'If you leave now, your answers will not be saved and your progress will be reset.',
+        'Abandon Quiz?',
+        'Progress will be lost.',
         [
-          { text: "Stay", style: 'cancel', onPress: () => {} },
+          { text: "Stay", style: 'cancel' },
           {
             text: 'Leave',
             style: 'destructive',
-            onPress: () => navigation.dispatch(e.data.action),
+            onPress: () => {
+              resetQuiz();
+              setIsStarted(false);
+              navigation.dispatch(e.data.action); 
+            },
           },
         ]
       );
@@ -101,30 +135,6 @@ export default function QuizScreen() {
     }
   }, [currentQuestionIndex]);
 
-  const handleDownloadReport = async (finalScore) => {
-    const htmlContent = `
-      <html>
-        <body style="font-family: sans-serif; text-align: center; padding: 50px;">
-          <h1 style="color: ${Colors.primary};">Quiz Report Card 🏆</h1>
-          <hr/>
-          <p style="font-size: 20px;">Scholar: <strong>${profile?.fullName || 'User'}</strong></p>
-          <p style="font-size: 18px;">Subject: <strong>${categoryTitle}</strong></p>
-          <p style="font-size: 24px; color: #27AE60;">Score: ${finalScore} Pts</p>
-          <p>Accuracy: ${results.correct} / ${questions.length} Correct ✅</p>
-          <div style="margin-top: 50px; border-top: 1px solid #EEE; padding-top: 20px;">
-            <p style="font-size: 12px; color: #888;">Generated from Brain-buzz App 💙</p>
-          </div>
-        </body>
-      </html>
-    `;
-    try {
-      const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
-    } catch (error) {
-      Alert.alert("Error", "Could not generate PDF");
-    }
-  };
-
   const handleAutoSkip = () => {
     setIsAnswered(true);
     setSelectedOption('timeout'); 
@@ -135,11 +145,9 @@ export default function QuizScreen() {
     if (isAnswered) return;
     setSelectedOption(option);
     setIsAnswered(true);
-
     if (option === questions[currentQuestionIndex].correctAnswer) {
       setScore(prev => prev + 10);
     }
-
     submitAnswer(option);
   };
 
@@ -157,20 +165,19 @@ export default function QuizScreen() {
   const finishQuiz = async () => {
     const finalScore = score;
     setIsStarted(false);
+    
     if (user?.uid) {
       try {
         const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, {
-          totalScore: increment(finalScore) 
-        });
+        await updateDoc(userRef, { totalScore: increment(finalScore) });
       } catch (error) {
-        console.error("Leaderboard Sync Error:", error);
+        console.error("Sync Error:", error);
       }
     }
 
     Alert.alert(
       "Quiz Completed!",
-      `You earned ${finalScore} points!`,
+      `Score: ${finalScore}`,
       [
         { text: "Share Report", onPress: () => handleDownloadReport(finalScore) },
         { text: "Done", onPress: () => router.replace('/(main)') }
@@ -178,22 +185,13 @@ export default function QuizScreen() {
     );
   };
 
-  if (!isStarted) {
+  if (isLoading || !isStarted) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={{ marginTop: 10, fontFamily: 'Ubuntu-Medium' }}>Preparing assessment...</Text>
-      </View>
-    );
-  }
-
-  if (questions.length === 0) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.questionText}>No questions found. Go to your home page to select your preffered course</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: Colors.primary, marginTop: 10 }}>Go Back</Text>
-        </TouchableOpacity>
+        <Text style={{ marginTop: 10, fontFamily: 'Ubuntu-Medium' }}>
+           {isLoading ? "Loading Questions..." : "Preparing assessment..."}
+        </Text>
       </View>
     );
   }
@@ -203,7 +201,7 @@ export default function QuizScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={28} color={Colors.text} />
         </TouchableOpacity>
         <View style={styles.timerContainer}>
@@ -224,9 +222,9 @@ export default function QuizScreen() {
 
       <View style={styles.quizContent}>
         <Text style={styles.categoryTitle}>{categoryTitle}</Text>
-        <Text style={styles.questionText}>{currentQuestion.question}</Text>
+        <Text style={styles.questionText}>{currentQuestion?.question}</Text>
 
-        {currentQuestion.options.map((option, index) => {
+        {currentQuestion?.options.map((option, index) => {
           const isCorrect = option === currentQuestion.correctAnswer;
           const isSelected = option === selectedOption;
           

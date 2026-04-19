@@ -25,11 +25,9 @@ export const useAuthStore = create(
       hasFinishedOnboarding: false,
       biometricEnabled: false,
       profileImage: null,
-      _hasHydrated: false, // Prevents routing logic from running before storage is loaded
+      _hasHydrated: false, 
 
       // --- ACTIONS ---
-
-      // Internal action to update hydration status
       setHasHydrated: (state) => set({ _hasHydrated: state }),
       setBiometricEnabled: (value) => set({ biometricEnabled: value }),
 

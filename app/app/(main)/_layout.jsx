@@ -28,7 +28,6 @@ export default function TabsLayout() {
         },
       }}
     >
-      {/* Dashboard / Home */}
       <Tabs.Screen
         name="index"
         options={{
@@ -39,7 +38,6 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* Quizzes / Categories */}
       <Tabs.Screen
         name="quiz"
         options={{
@@ -54,7 +52,6 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* Leaderboard / Rankings */}
       <Tabs.Screen
         name="leaderboard"
         options={{
@@ -69,7 +66,6 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* 4. History / Activity */}
       <Tabs.Screen
         name="history"
         options={{
@@ -84,7 +80,6 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* 5. Profile */}
       <Tabs.Screen
         name="profile"
         options={{

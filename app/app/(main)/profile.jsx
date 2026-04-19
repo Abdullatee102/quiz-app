@@ -22,7 +22,7 @@ import { db, auth } from '../../firebaseConfig';
 
 export default function ProfileScreen() {
   const { user, profile, fetchProfile } = useAuthStore();
-  const { results } = useQuizStore(); // Use global quiz results
+  const { results } = useQuizStore(); 
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
 
@@ -31,7 +31,7 @@ export default function ProfileScreen() {
   const totalScore = profile?.totalScore || results.totalScore || 0; 
   const correctAnswers = profile?.totalCorrect || results.correct || 0;
 
-  const userInitial = profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S';
+  const userInitial = (profile?.fullName || user?.displayName || 'S').charAt(0).toUpperCase();
   const profileImage = profile?.photoURL || user?.photoURL;
 
   const pickImage = async () => {
@@ -42,7 +42,7 @@ export default function ProfileScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'images',
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.5,
@@ -96,7 +96,7 @@ export default function ProfileScreen() {
               {uploading ? <ActivityIndicator size="small" color="#fff" /> : <Ionicons name="camera" size={16} color="#fff" />}
             </View>
           </TouchableOpacity>
-          <Text style={styles.userName}>{profile?.fullName || 'Scholar'}</Text>
+          <Text style={styles.userName}>{profile?.fullName|| user?.displayName?.split(' ')[0] || 'Scholar'}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
         </View>
 

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Brain Buzz",
-    "slug": "brainbuzz",
+    "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -57,7 +57,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f4913c2d-5e7a-49a0-a36e-ca32cc40a6c1"
+        "projectId": "ebd859a9-74e7-4f7a-9079-781a2426493b"
       }
     },
     "owner": "abdullatee102"

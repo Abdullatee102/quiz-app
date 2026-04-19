@@ -9,7 +9,6 @@ import { Colors } from '../../constants/colors';
 export default function LiveChatScreen() {
   const router = useRouter();
   
-  // REPLACE THIS with your actual Tawk.to property link
   const TAWK_TO_URL = 'https://tawk.to/chat/69e402356936c61c3874666d/1jmhah8ud';
 
   return (

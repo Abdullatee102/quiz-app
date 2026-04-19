@@ -40,11 +40,9 @@ export default function LoginScreen() {
   };
 
   const handleBiometricAuth = async () => {
-    // 1. Check hardware
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
     
-    // 2. CHECK: Has this device been used to sign in before?
     const biometricEnabled = await AsyncStorage.getItem('useBiometrics');
     const savedEmail = await AsyncStorage.getItem('lastUserEmail');
 
@@ -68,9 +66,6 @@ export default function LoginScreen() {
 
     if (result.success) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // In a production app, you'd use SecureStore to retrieve the password 
-      // and call login(savedEmail, savedPassword). 
-      // For now, we proceed to the main app if the device check passes.
       router.replace('/(main)');
     }
   };

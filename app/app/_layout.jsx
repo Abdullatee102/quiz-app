@@ -48,8 +48,13 @@ export default function RootLayout() {
 
     return () => { 
       if (unsubscribe) unsubscribe(); 
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
+    
+      if (notificationListener.current) {
+        notificationListener.current.remove();
+      }
+      if (responseListener.current) {
+        responseListener.current.remove();
+      }
     };
   }, []);
 
