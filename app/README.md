@@ -1,50 +1,76 @@
-# Welcome to your Expo app 👋
+# 🧠 BrainBuzz
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**BrainBuzz** is a dynamic, high-energy mobile quiz application built with **React Native** and **Expo**. Designed for both fun and learning, it challenges users across various categories while providing a sleek, modern UI/UX inspired by current design trends.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Features
 
-   ```bash
-   npm install
-   ```
+* **Real-time Quizzing:** Interactive multiple-choice questions with instant feedback.
+* **Firebase Integration:** Robust backend for user authentication (Google Sign-In) and data persistence.
+* **State Management:** Powered by **Zustand** for a lightweight and scalable state logic.
+* **Sleek UI:** Replicated from high-fidelity Figma designs to ensure a premium look and feel.
+* **Progress Tracking:** Local data persistence using **AsyncStorage** to remember user settings and high scores.
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 🛠️ Tech Stack
 
-In the output, you'll find options to open the app in a
+* **Framework:** [React Native](https://reactnative.dev/) (Expo)
+* **Language:** JavaScript / TypeScript
+* **Backend:** [Firebase](https://firebase.google.com/) (Auth, Realtime Database)
+* **State Management:** [Zustand](https://github.com/pmndrs/zustand)
+* **Navigation:** React Navigation (Native Stack & Tabs)
+* **Styling:** StyleSheet (Flexbox)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📦 Installation & Setup
 
-## Get a fresh project
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/Abdullatee102/QuizApp.git](https://github.com/Abdullatee102/brain-buzz.git)
+    cd app
+    ```
 
-When you're ready, run:
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-```bash
-npm run reset-project
-```
+3.  **Configure Environment Variables:**
+    Create a `.env` file in the root directory and add your Firebase configuration:
+    ```env
+    EXPO_PUBLIC_FIREBASE_API_KEY=YOUR_API_KEY
+    EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=YOUR_AUTH_DOMAIN
+    EXPO_PUBLIC_FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
+    EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=YOUR_STORAGE_BUCKET
+    EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=YOUR_SENDER_ID
+    EXPO_PUBLIC_FIREBASE_APP_ID=YOUR_APP_ID
+    ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+4.  **Start the app:**
+    ```bash
+    npx expo start
+    ```
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🏗️ Building in Public
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+This project is part of my **100-Day Coding Challenge**. I am documenting the journey of turning Figma designs into functional code and solving complex problems in real-time.
 
-## Join the community
+* **Focus:** Perfecting UI replications and optimizing Firebase authentication logic.
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Abdullatee102/QuizApp/issues).
+
+## 📄 License
+
+This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
+
+---
+**Developed by [Popoola Abdullateef](https://github.com/Abdullatee102)**
